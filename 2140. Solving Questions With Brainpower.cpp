@@ -7,7 +7,7 @@ class Solution
 public:
     long long mostPoints(std::vector<std::vector<int>> const &questions)
     {
-        size_t n{questions.size()};
+        int n{static_cast<int>(questions.size())};
         if (n == 0 || n > std::pow(10, 5))
             return 0;
         for (auto const &subarr : questions)
