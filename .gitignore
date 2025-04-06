@@ -2,6 +2,7 @@
 *vgcore*
 main
 *.out
+*.exe
 *.sh
 *.o
 *.so*
