@@ -89,8 +89,6 @@ int minOperations(int *nums, int numsSize, int k) {
   // Base cases:
   if (!nums || numsSize == 0)
     return -1;
-  if (numsSize == 1)
-    return nums[0] == k ? 0 : -1;
   if (numsSize == 1 && nums[0] > k)
     return 1;
 
