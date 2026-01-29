@@ -1,0 +1,134 @@
+If:
+  PathMatch: .*\.(h|hpp|c|cpp|ipp|cuh|cu|.inl)
+CompileFlags:
+  Compiler: clang-cl
+  Add:
+    # C++ Standard and Warning Flags
+    - /std:c++20
+    - /W4
+    # - /WX # Treat warnings as errors
+    - /permissive- # Enable C++11 standard compliance
+    - /Zc:twoPhase # Enable two-phase name lookup (more aggressive standard compliance)
+    - /EHsc # Enable exception handling
+
+    # Optimizations and security
+    - /O2 # Aggressive optimizations
+    - /sdl # Enable SDL checks (security checks for Windows)
+    - /guard:cf # Enable control flow guard (for buffer overflow detection)
+    - /Zc:inline # Remove unused inline functions
+    - /Zc:__cplusplus # Enable C++20 standard compliance
+    - -D__cplusplus=202002L
+    - /Zc:strictStrings # Enable strict string checking
+    - /Zi # Enable PDB generation
+    - /DEBUG # Enable debug information
+    - /analyze # Enable static analysis (if it's available)
+
+    # Project Include Paths
+    - -IE:/Develop/PEAK_EXPERT_WEB
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/include
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/include/SimpleAmqpClient
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/Instrument
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/InstrumentBase
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/Math
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/Plot
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/Pump
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/PxCalc
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/spdlog
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/User
+    - -IE:/Develop/PEAK_EXPERT_WEB/BusinessLogic/PeakExpertNoGUI/PeakExpertNoGUI/Utility
+
+    - -IE:/Develop/PEAK_EXPERT_WEB/DChannel
+    - -IE:/Develop/PEAK_EXPERT_WEB/DChannel/src
+    - -IE:/Develop/PEAK_EXPERT_WEB/DChannel/3rdparty/asio/include
+
+    - -IE:/local/Boost/boost_1_88_0
+    - -IE:/local/GoogleTest/googletest-release-1.12.1/include
+
+    # Preprocessor Defines
+    - -D_WIN32_WINNT=0x0A00
+    - -DWINVER=0x0A00
+    - -DWIN32_LEAN_AND_MEAN
+    - -DNOMINMAX
+    - -D_WIN32
+    - -D_WIN64
+    - -DUNICODE
+    - -D_UNICODE
+
+    - -DASIO_STANDALONE=1
+    - -DASIO_NO_DEPRECATED=1
+
+# Indexing configuration
+Index:
+  Background: Skip
+  StandardLibrary: Yes
+
+# Diagnostics configuration
+Diagnostics:
+  Suppress:
+    - llvmlibc-callee-namespace
+    - llvmlibc-inline-function-decl
+    - llvmlibc-restrict-system-libc-headers
+    - llvmlibc-implementation-in-namespace
+
+    - cppcoreguidelines-pro-type-reinterpret-cast
+
+    - modernize-use-trailing-return-type
+
+    - readability-braces-around-statements
+
+    - altera-unroll-loops
+    - hicpp-braces-around-statements
+    - fuchsia-overloaded-operator
+    - fuchsia-default-arguments-calls
+    - fuchsia-default-arguments-declarations
+    - google-readability-braces-around-statements
+  # Enable clang-tidy checks
+  ClangTidy:
+    Add:
+      - "*"
+
+      # Disable style-specific check suites (project-specific choice)
+      - altera-*
+      - android-*
+      - boost-*
+      - fuchsia-*
+      - google-*
+      - hicpp-*
+      - llvm-*
+      - mpi-*
+      - objc-*
+      - openmp-*
+      - zircon-*
+
+      # Disable checks that are too noisy / not fitting the project
+      - modernize-use-trailing-return-type
+      - cppcoreguidelines-avoid-magic-numbers
+      - readability-magic-numbers
+      - readability-function-cognitive-complexity
+      - readability-function-size
+      - readability-identifier-length
+      - readability-braces-around-statements
+      - misc-non-private-member-variables-in-classes
+      - misc-unused-using-decls
+
+      # Performance checks that may be too aggressive
+      - performance-unnecessary-value-param
+      - performance-avoid-endl
+
+      # Modernize checks that may break compatibility / project conventions
+      - modernize-use-auto
+      - modernize-avoid-c-arrays
+      - modernize-use-nullptr
+
+      # Portability checks that may be too strict for intentional platform-specific code
+      - portability-simd-intrinsics
+
+      # Concurrency checks that may be too strict when external synchronization is used
+      - concurrency-mt-unsafe
+
+# InlayHints configuration
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes

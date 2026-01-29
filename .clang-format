@@ -1,0 +1,89 @@
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# Supported styles:
+# - LLVM
+# - Google
+# - Chromium
+# - Mozilla
+# - WebKit
+# - Microsoft
+# - GNU
+
+BasedOnStyle: GNU
+AlignAfterOpenBracket: Align
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortCaseExpressionOnASingleLine: true
+AllowShortCompoundRequirementOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+
+# Uncommenting these following 2 lines will sometimes result in lines following an
+# if(){} or for(){} block being attached to the end of the block.
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: false
+  AfterUnion: false
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeWhile: false
+  BeforeLambdaBody: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+ColumnLimit: 120
+ContinuationIndentWidth: 2
+KeepEmptyLinesAtTheStartOfBlocks: false
+Language: Cpp
+Standard: Cpp11
+Cpp11BracedListStyle: true
+MaxEmptyLinesToKeep: 1
+NamespaceIndentation: All
+PenaltyExcessCharacter: 150
+PenaltyReturnTypeOnItsOwnLine: 1
+PointerAlignment: Right
+ReferenceAlignment: Right
+QualifierAlignment: Right
+ReflowComments: true # on 20.1.0 replace "true" with "IndentOnly"
+PackConstructorInitializers: NextLine
+AllowAllArgumentsOnNextLine: true
+RemoveBracesLLVM: true
+SortIncludes: true
+SpaceBeforeParens: Never
+SpacesInContainerLiterals: false
+# RemoveEmptyLinesInUnwrappedLines: true # works on 20.1.0
+RemoveParentheses: Leave
+SkipMacroDefinitionBody: true
+SortUsingDeclarations: LexicographicNumeric
+SpaceAfterCStyleCast: false
+
+AlignConsecutiveBitFields:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: false
+
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: false
+
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: false
+
+IndentPPDirectives: BeforeHash
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never

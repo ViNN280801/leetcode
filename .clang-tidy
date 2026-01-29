@@ -1,0 +1,546 @@
+# =============================================================================
+# .clang-tidy - Advanced Strict Linting Configuration
+# =============================================================================
+# Comprehensive clang-tidy configuration for strict code quality, security,
+# bug detection, and best practices enforcement.
+#
+# This configuration enables ALL checks by default, then selectively disables
+# only those that are too noisy or don't fit the project.
+#
+# Usage:
+#   - clangd automatically uses this file when present
+#   - Run manually: clang-tidy -p build file.cpp
+#   - In CMake: Use StaticAnalysisConfig.cmake module
+#
+# =============================================================================
+
+# =============================================================================
+# CHECK CONFIGURATION
+# =============================================================================
+# Enable ALL checks, then disable only noisy/inappropriate ones
+Checks: >
+  *,
+  # Disable style-specific checks (adjust based on your coding standards)
+  -altera-*,
+  -android-*,
+  -boost-*,
+  -fuchsia-*,
+  -google-*,
+  -hicpp-*,
+  -llvm-*,
+  llvm-namespace-comment,  # Require closing brace comments for namespaces: } // namespace Name
+  -mpi-*,
+  -objc-*,
+  -openmp-*,
+  -zircon-*,
+
+  # Disable checks that are too noisy or don't fit the project
+  -modernize-use-trailing-return-type,           # Project style preference
+  -cppcoreguidelines-avoid-magic-numbers,        # Too noisy, use constants instead
+  -readability-magic-numbers,                    # Too noisy, use constants instead
+  -readability-function-cognitive-complexity,    # Can be too strict
+  -readability-function-size,                    # Can be too strict for some projects
+  -readability-identifier-length,                # Project may have short names
+  -readability-braces-around-statements,         # Project style preference
+  -misc-non-private-member-variables-in-classes, # May conflict with project design
+  -misc-unused-using-decls,                      # Can be noisy in headers
+
+  # Performance checks that may be too aggressive
+  -performance-unnecessary-value-param,          # May conflict with move semantics
+  -performance-avoid-endl,                       # May be intentional for flushing
+
+  # Modernize checks that may break compatibility
+  -modernize-use-auto,                           # Some prefer explicit types
+  -modernize-avoid-c-arrays,                     # May be intentional for C compatibility
+  -modernize-use-nullptr,                        # May need NULL for C compatibility
+
+  # Portability checks that may be too strict
+  -portability-simd-intrinsics,                  # Platform-specific code is intentional
+
+  # Concurrency checks that may be too strict
+  -concurrency-mt-unsafe,                        # May have external synchronization
+
+# =============================================================================
+# WARNINGS AS ERRORS
+# =============================================================================
+# Treat critical security and bug checks as errors
+# These are the most important checks that should never be ignored
+WarningsAsErrors: >
+  # Security checks - CRITICAL
+  clang-analyzer-security.*,
+  cert-*,
+  security-*,
+
+  # Bug-prone patterns - CRITICAL
+  bugprone-*,
+
+  # Memory safety - CRITICAL
+  clang-analyzer-core.*,
+  clang-analyzer-cplusplus.*,
+  clang-analyzer-deadcode.*,
+  clang-analyzer-nullability.*,
+  clang-analyzer-optin.*,
+  clang-analyzer-osx.*,
+  clang-analyzer-unix.*,
+  clang-analyzer-valist.*,
+
+  # Core guidelines violations - IMPORTANT
+  cppcoreguidelines-pro-type-*,
+  cppcoreguidelines-pro-bounds-*,
+  cppcoreguidelines-pro-owner-*,
+  cppcoreguidelines-avoid-*,
+
+  # Concurrency issues - CRITICAL
+  concurrency-*,
+
+  # Portability issues that cause bugs
+  portability-*
+
+# =============================================================================
+# HEADER FILTER
+# =============================================================================
+# Only analyze project code, exclude third-party libraries
+# This prevents false positives from external code
+HeaderFilterRegex: "^(src|include)/.*"
+
+# Don't inherit parent config (use this file as source of truth)
+InheritParentConfig: false
+
+# =============================================================================
+# CHECK OPTIONS - Fine-tuned Settings
+# =============================================================================
+CheckOptions:
+  # ========================================================================
+  # Bug-prone Checks Configuration
+  # ========================================================================
+
+  # Unsafe functions: report all unsafe/deprecated functions
+  bugprone-unsafe-functions.ReportDefaultFunctions: true
+  bugprone-unsafe-functions.ReportMoreUnsafeFunctions: true
+
+  # Argument padding: check for suspicious argument padding
+  bugprone-argument-padding.WarnOnPotentialMisalignments: true
+
+  # Assert side effect: detect side effects in assertions
+  bugprone-assert-side-effect.CheckFunctionCalls: true
+
+  # Bool pointer implicit conversion: detect implicit bool conversions
+  bugprone-bool-pointer-implicit-conversion.AllowSafeBool: false
+
+  # Branch clone: detect identical branches
+  bugprone-branch-clone.MinComplexity: 3
+
+  # Copy constructor init: detect missing base class initialization
+  bugprone-copy-constructor-init.WarnOnBaseClass: true
+
+  # Dangling handle: detect dangling references/pointers
+  bugprone-dangling-handle.CheckDanglingTemporaries: true
+
+  # Double locking: detect double lock/unlock
+  bugprone-double-lock.CheckUnlock: true
+
+  # Exception escape: detect exceptions escaping destructors
+  bugprone-exception-escape.AllowedExceptions: ""
+
+  # Forward declaration namespace: detect namespace mismatches
+  bugprone-forward-declaration-namespace.CheckNamespaces: true
+
+  # Forwarding reference overload: detect forwarding reference issues
+  bugprone-forwarding-reference-overload.CheckTemplate: true
+
+  # Function pointer: detect function pointer issues
+  bugprone-function-pointer.EnableCppCoreGuidelines: true
+
+  # Implicit widening conversion: detect narrowing conversions
+  bugprone-implicit-widening-of-multiplication-result.WarnOnIntegerMultiplication: true
+
+  # Infinite loop: detect infinite loops
+  bugprone-infinite-loop.MinLoopIterations: 0
+
+  # Integer division: detect integer division issues
+  bugprone-integer-division.WarnOnModulo: true
+
+  # Lambda function name: detect lambda naming issues
+  bugprone-lambda-function-name.CheckTemplateSpecialization: true
+
+  # Macro parentheses: detect missing parentheses in macros
+  bugprone-macro-parentheses.CheckParens: true
+
+  # Macro repeated side effects: detect repeated side effects
+  bugprone-macro-repeated-side-effects.MaxAllowedRepeats: 1
+
+  # Misplaced operator delete: detect delete/delete[] mismatches
+  bugprone-misplaced-operator-delete.CheckNew: true
+
+  # Misplaced widening cast: detect suspicious casts
+  bugprone-misplaced-widening-cast.CheckImplicitCasts: true
+
+  # Move forward: detect std::move on forward references
+  bugprone-move-forwarding-reference.CheckTemplateFunctions: true
+
+  # Multiple statement macro: detect multi-statement macros
+  bugprone-multiple-statement-macro.MaxStatementsInMacro: 1
+
+  # No escape: detect unescaped special characters
+  bugprone-no-escape.AllowedFunctions: ""
+
+  # Not null pointer parameter: detect null pointer parameters
+  bugprone-not-null-pointer-parameter.CheckFunctionCalls: true
+
+  # Parent virtual call: detect virtual calls in constructors/destructors
+  bugprone-parent-virtual-call.CheckDestructors: true
+
+  # Posix return: detect missing return value checks
+  bugprone-posix-return.CheckPosixReturn: true
+
+  # Redundant branch condition: detect redundant conditions
+  bugprone-redundant-branch-condition.CheckConditionalAssignment: true
+
+  # Reserved identifier: detect reserved identifier usage
+  bugprone-reserved-identifier.CheckReservedMacros: true
+
+  # Signal handler: detect unsafe signal handlers
+  bugprone-signal-handler.CheckAsyncSafeFunctions: true
+
+  # Signed char misuse: detect signed char issues
+  bugprone-signed-char-misuse.WarnOnIntegerConversion: true
+
+  # Size of container: detect sizeof(container) issues
+  bugprone-sizeof-container.CheckAllocator: true
+
+  # Size of expression: detect sizeof(expression) issues
+  bugprone-sizeof-expression.WarnOnSizeOfPointerExpression: true
+
+  # Spurious new: detect spurious new/delete
+  bugprone-spurious-new.CheckDelete: true
+
+  # String integer assignment: detect string/integer confusion
+  bugprone-string-integer-assignment.CheckStringToInteger: true
+
+  # String literal with embedded null: detect null bytes in strings
+  bugprone-string-literal-with-embedded-nul.CheckStringLiterals: true
+
+  # Suspicious enum usage: detect suspicious enum usage
+  bugprone-suspicious-enum-usage.CheckEnumValueRange: true
+
+  # Suspicious missing comma: detect missing commas
+  bugprone-suspicious-missing-comma.CheckMacros: true
+
+  # Suspicious semicolon: detect suspicious semicolons
+  bugprone-suspicious-semicolon.CheckEmptyBody: true
+
+  # Suspicious string compare: detect string comparison issues
+  bugprone-suspicious-string-compare.CheckStringLiteral: true
+
+  # Swapped arguments: detect swapped function arguments
+  bugprone-swapped-arguments.CheckImplicitConversions: true
+
+  # Too small loop variable: detect loop variable type issues
+  bugprone-too-small-loop-variable.CheckLoopVariables: true
+
+  # Undefined memory manipulation: detect undefined memory operations
+  bugprone-undefined-memory-manipulation.CheckMemset: true
+
+  # Unhandled self assignment: detect missing self-assignment checks
+  bugprone-unhandled-self-assignment.CheckMoveAssignment: true
+
+  # Unused raii: detect unused RAII objects
+  bugprone-unused-raii.CheckTemporaryObjects: true
+
+  # Unused return value: detect unused return values
+  bugprone-unused-return-value.CheckFunctionCalls: true
+
+  # Use after move: detect use-after-move
+  bugprone-use-after-move.CheckStdLibrary: true
+
+  # Virtual near miss: detect virtual function near misses
+  bugprone-virtual-near-miss.CheckOverloadedVirtual: true
+
+  # ========================================================================
+  # CERT Secure Coding Checks Configuration
+  # ========================================================================
+
+  # CERT memory management
+  cert-mem57-c.WarnOnMallocFree: true
+  cert-err33-c.CheckStrToNumFunctions: true
+  cert-err34-c.CheckScanfFamily: true
+  cert-err50-cpp.CheckExceptionSpec: true
+  cert-err52-cpp.CheckExceptionHandling: true
+  cert-err58-cpp.CheckExceptionSpec: true
+  cert-err60-cpp.CheckExceptionHandling: true
+  cert-err61-cpp.CheckExceptionHandling: true
+
+  # CERT deprecated functions
+  cert-msc24-c.CheckDeprecatedFunctions: true
+  cert-msc30-c.CheckRandFunctions: true
+  cert-msc50-cpp.CheckDeprecatedFunctions: true
+
+  # CERT signal handling
+  cert-sig30-c.CheckAsyncSafeFunctions: true
+
+  # CERT string handling
+  cert-str31-c.CheckStringFunctions: true
+  cert-str34-c.CheckStringFunctions: true
+  cert-str35-c.CheckStringFunctions: true
+
+  # ========================================================================
+  # C++ Core Guidelines Configuration
+  # ========================================================================
+
+  # Type safety
+  cppcoreguidelines-pro-type-const-cast.WarnOnConstCast: true
+  cppcoreguidelines-pro-type-cstyle-cast.WarnOnCStyleCast: true
+  cppcoreguidelines-pro-type-reinterpret-cast.WarnOnReinterpretCast: true
+  cppcoreguidelines-pro-type-static-cast-downcast.WarnOnDowncast: true
+  cppcoreguidelines-pro-type-union-access.WarnOnUnionAccess: true
+  cppcoreguidelines-pro-type-vararg.WarnOnVararg: true
+
+  # Bounds safety
+  cppcoreguidelines-pro-bounds-array-to-pointer-decay.WarnOnArrayDecay: true
+  cppcoreguidelines-pro-bounds-constant-array-index.WarnOnConstantIndex: true
+  cppcoreguidelines-pro-bounds-pointer-arithmetic.WarnOnPointerArithmetic: true
+
+  # Lifetime safety
+  cppcoreguidelines-pro-type-member-init.WarnOnUninitializedMembers: true
+  cppcoreguidelines-pro-type-member-init.IgnoreArrays: false
+
+  # Ownership
+  cppcoreguidelines-owning-memory.WarnOnRawPointers: true
+
+  # Avoid patterns
+  cppcoreguidelines-avoid-c-arrays.WarnOnCArrays: true
+  cppcoreguidelines-avoid-magic-numbers.WarnOnMagicNumbers: false # Disabled (too noisy)
+  cppcoreguidelines-avoid-non-const-global-variables.WarnOnGlobalVariables: true
+
+  # ========================================================================
+  # Clang Analyzer Configuration
+  # ========================================================================
+
+  # Core analyzer options
+  clang-analyzer-core.CallAndMessage: true
+  clang-analyzer-core.DivideZero: true
+  clang-analyzer-core.DynamicTypePropagation: true
+  clang-analyzer-core.NonNullParamChecker: true
+  clang-analyzer-core.NullDereference: true
+  clang-analyzer-core.StackAddressEscape: true
+  clang-analyzer-core.UndefinedBinaryOperatorResult: true
+  clang-analyzer-core.UninitializedValues: true
+  clang-analyzer-core.VLASize: true
+
+  # C++ analyzer options
+  clang-analyzer-cplusplus.InnerPointer: true
+  clang-analyzer-cplusplus.Move: true
+  clang-analyzer-cplusplus.NewDelete: true
+  clang-analyzer-cplusplus.NewDeleteLeaks: true
+  clang-analyzer-cplusplus.PlacementNew: true
+  clang-analyzer-cplusplus.SelfAssignment: true
+  clang-analyzer-cplusplus.SmartPtr: true
+
+  # Dead code analyzer
+  clang-analyzer-deadcode.DeadStores: true
+  clang-analyzer-deadcode.UnreachableCode: true
+
+  # Security analyzer
+  clang-analyzer-security.FloatLoopCounter: true
+  clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling: true
+  clang-analyzer-security.insecureAPI.bcmp: true
+  clang-analyzer-security.insecureAPI.bcopy: true
+  clang-analyzer-security.insecureAPI.bzero: true
+  clang-analyzer-security.insecureAPI.getpw: true
+  clang-analyzer-security.insecureAPI.gets: true
+  clang-analyzer-security.insecureAPI.mkstemp: true
+  clang-analyzer-security.insecureAPI.mktemp: true
+  clang-analyzer-security.insecureAPI.rand: true
+  clang-analyzer-security.insecureAPI.strcpy: true
+  clang-analyzer-security.insecureAPI.vfork: true
+
+  # Unix analyzer
+  clang-analyzer-unix.API: true
+  clang-analyzer-unix.DynamicMemory: true
+  clang-analyzer-unix.Malloc: true
+  clang-analyzer-unix.MallocSizeof: true
+  clang-analyzer-unix.MismatchedDeallocator: true
+  clang-analyzer-unix.cstring.BadSizeArg: true
+  clang-analyzer-unix.cstring.NullArg: true
+
+  # ========================================================================
+  # Concurrency Checks Configuration
+  # ========================================================================
+
+  # Thread safety
+  concurrency-mt-unsafe.WarnOnUnsafeFunctions: true
+
+  # ========================================================================
+  # Modernize Checks Configuration
+  # ========================================================================
+
+  # Use modern C++ features
+  modernize-use-auto.MinTypeNameLength: 5
+  modernize-use-auto.RemoveStars: false
+  modernize-use-nullptr.TransformSmartPointers: true
+  modernize-use-override.AddOverride: true
+  modernize-use-override.IgnoreDestructors: false
+
+  # ========================================================================
+  # Performance Checks Configuration
+  # ========================================================================
+
+  # Performance optimizations
+  performance-for-range-copy.WarnOnAllAutoCopies: true
+  performance-implicit-conversion-in-loop.WarnOnImplicitConversion: true
+  performance-inefficient-algorithm.WarnOnInefficientAlgorithm: true
+  performance-inefficient-string-concatenation.WarnOnStringConcatenation: true
+  performance-inefficient-vector-operation.WarnOnVectorOperations: true
+  performance-move-const-arg.WarnOnConstArg: true
+  performance-no-automatic-move.WarnOnAutomaticMove: true
+  performance-trivially-destructible.WarnOnTriviallyDestructible: true
+  performance-type-promotion-in-math-fn.WarnOnTypePromotion: true
+  performance-unnecessary-copy-initialization.WarnOnCopyInitialization: true
+  performance-unnecessary-value-param.WarnOnValueParam: true
+
+  # ========================================================================
+  # Readability Checks Configuration
+  # ========================================================================
+
+  # Code readability
+  readability-avoid-const-params-in-decls.RemoveConst: false
+  readability-braces-around-statements.ShortStatementLines: 1
+  readability-container-size-empty.UseEmpty: true
+  readability-convert-member-functions-to-static.CheckCppMethods: true
+  readability-delete-null-pointer.WarnOnDeleteNullPointer: true
+  readability-else-after-return.WarnOnUnnecessaryElse: true
+  readability-function-cognitive-complexity.Threshold: 25
+  readability-function-size.LineThreshold: 200
+  readability-function-size.ParameterThreshold: 8
+  readability-function-size.NestingThreshold: 4
+  readability-identifier-naming.IgnoreMainLikeFunctions: true
+  readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+  readability-identifier-naming.MacroDefinitionIgnoredRegexp: "^[A-Z][A-Z0-9_]*$"
+  readability-identifier-naming.ConceptCase: PascalCase
+  readability-identifier-naming.NamespaceCase: CamelCase
+  readability-identifier-naming.GlobalConstantCase: CamelCase
+  readability-identifier-naming.GlobalConstantPrefix: k
+  readability-identifier-naming.GlobalFunctionCase: CamelCase
+  readability-identifier-naming.GlobalVariableCase: camelCase
+  readability-identifier-naming.GlobalVariablePrefix: g_
+  readability-identifier-naming.GlobalConstVariableCase: camelCase
+  readability-identifier-naming.GlobalConstVariablePrefix: k
+  readability-identifier-naming.ConstexprVariableCase: CamelCase
+  readability-identifier-naming.ConstexprVariablePrefix: k
+  readability-identifier-naming.TypedefCase: CamelCase
+  readability-identifier-naming.UnionCase: CamelCase
+  readability-identifier-naming.VariableCase: camelCase
+  readability-identifier-naming.ClassCase: CamelCase
+  readability-identifier-naming.ClassMemberCase: CamelCase
+  readability-identifier-naming.AbstractClassCase: CamelCase
+  readability-identifier-naming.AbstractClassPrefix: I
+  readability-identifier-naming.StructCase: lower_case
+  readability-identifier-naming.StructPostfix: _t
+  readability-identifier-naming.StructMemberCase: lower_case
+  readability-identifier-naming.PrivateMemberPrefix: m_
+  readability-identifier-naming.ProtectedMemberPrefix: m_
+  readability-identifier-naming.PrivateMethodCase: camelCase
+  readability-identifier-naming.PrivateMethodPrefix: _
+  readability-identifier-naming.PublicMemberCase: PascalCase
+  readability-identifier-naming.EnumCase: CamelCase
+  readability-identifier-naming.EnumConstantCase: CamelCase
+  readability-identifier-naming.FunctionCase: CamelCase
+  readability-identifier-naming.ParameterCase: camelCase
+  readability-identifier-naming.LocalConstantCase: camelCase
+  readability-identifier-naming.LocalVariableCase: camelCase
+  readability-identifier-naming.StaticConstantCase: CamelCase
+  readability-identifier-naming.StaticConstantPrefix: k
+  readability-identifier-naming.StaticVariableCase: camelCase
+  readability-implicit-bool-conversion.AllowIntegerConditions: false
+  readability-implicit-bool-conversion.AllowPointerConditions: false
+  readability-isolate-declaration.MaxDeclarations: 1
+  readability-magic-numbers.IgnoreNumericSequences: true
+  readability-magic-numbers.IgnorePowersOfTwo: false
+  readability-magic-numbers.IgnoreUserDefinedLiterals: true
+  readability-misleading-indentation.CheckIfStatements: true
+  readability-named-parameter.IgnoreSingleElementFunctions: true
+  readability-qualified-auto.IgnoreTemplateType: true
+  readability-redundant-access-specifiers.WarnOnRedundantAccess: true
+  readability-redundant-control-flow.WarnOnUnreachableCode: true
+  readability-redundant-member-init.WarnOnRedundantInit: true
+  readability-redundant-preprocessor.IgnoreMacros: ""
+  readability-redundant-string-cstr.WarnOnRedundantCStr: true
+  readability-redundant-string-init.WarnOnRedundantInit: true
+  readability-simplify-boolean-expr.ChainedConditionalReturn: true
+  readability-simplify-subscript-expr.WarnOnArraySubscript: true
+  readability-static-accessed-through-instance.WarnOnStaticAccess: true
+  readability-string-compare.WarnOnStringCompare: true
+  readability-suspicious-call-argument.WarnOnSuspiciousCall: true
+  readability-uppercase-literal-suffix.WarnOnLowercaseSuffix: true
+  readability-use-anyofallof.WarnOnComplexConditions: true
+
+  # ========================================================================
+  # Misc Checks Configuration
+  # ========================================================================
+
+  # Miscellaneous checks
+  misc-const-correctness.WarnOnPointersToConst: true
+  misc-definitions-in-headers.WarnOnDefinitionsInHeaders: true
+  misc-misplaced-const.WarnOnMisplacedConst: true
+  misc-new-delete-overloads.WarnOnNewDeleteOverloads: true
+  misc-no-recursion.WarnOnRecursion: true
+  misc-non-copyable-objects.WarnOnNonCopyableObjects: true
+  misc-redundant-expression.WarnOnRedundantExpression: true
+  misc-static-assert.WarnOnStaticAssert: true
+  misc-throw-by-value-catch-by-reference.WarnOnThrowByValue: true
+  misc-unconventional-assign-operator.WarnOnUnconventionalAssign: true
+  misc-unused-alias-decls.WarnOnUnusedAlias: true
+  misc-unused-parameters.WarnOnUnusedParameters: true
+  misc-unused-using-decls.WarnOnUnusedUsing: true
+  misc-use-after-move.WarnOnUseAfterMove: true
+  misc-virtual-near-miss.WarnOnVirtualNearMiss: true
+
+  # ========================================================================
+  # LLVM Namespace Comment Configuration
+  # ========================================================================
+
+  # Require closing brace comments for namespaces
+  # Format: } // namespace Name
+  llvm-namespace-comment.ShortNamespaceLines: 1
+  llvm-namespace-comment.SpacesBeforeComments: 1
+  llvm-namespace-comment.AllowOmittingNamespaceComments: false
+# =============================================================================
+# USER NOTES
+# =============================================================================
+#
+# This configuration enables STRICT linting with focus on:
+# 1. Security vulnerabilities (CERT, security-*, clang-analyzer-security.*)
+# 2. Bug detection (bugprone-*, clang-analyzer-core.*)
+# 3. Memory safety (clang-analyzer-cplusplus.*, cert-mem*)
+# 4. Concurrency issues (concurrency-*)
+# 5. Code quality (readability-*, performance-*, modernize-*)
+#
+# Adjustments:
+# - If too many warnings: disable specific checks in the Checks section
+# - If false positives: add suppressions using NOLINT comments
+# - For third-party code: exclude via HeaderFilterRegex
+#
+# Usage:
+#   clang-tidy -p build file.cpp          # Check single file
+#   clang-tidy -p build -fix file.cpp     # Auto-fix issues
+#   run-clang-tidy.py -p build            # Check entire project
+#
+# =============================================================================
+# STYLE REQUIREMENTS (Manual Enforcement)
+# =============================================================================
+#
+# IMPORTANT: The following style requirements are not enforced by clang-tidy
+# but MUST be followed in code reviews:
+#
+# 1. Namespace closing braces MUST have comments:
+#    } // namespace Transport
+#    } // namespace Ex1800
+#
+# 2. Class/Struct closing braces MUST have comments:
+#    }; // class SteadyClockTimer
+#    }; // struct config_params_t
+#
+# Note: llvm-namespace-comment check enforces requirement #1 automatically.
+# For requirement #2, use code review or custom tooling.
+#
+# =============================================================================
