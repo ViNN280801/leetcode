@@ -72,10 +72,18 @@ Diagnostics:
     - llvmlibc-implementation-in-namespace
 
     - cppcoreguidelines-pro-type-reinterpret-cast
+    
+    - fuchsia-statically-constructed-objects
 
     - modernize-use-trailing-return-type
 
     - readability-braces-around-statements
+    - readability-redundant-inline-specifier
+    - readability-identifier-naming
+    - readability-identifier-length
+    - readability-convert-member-functions-to-static
+
+    - fuchsia-statically-constructed-objects
 
     - altera-unroll-loops
     - hicpp-braces-around-statements
