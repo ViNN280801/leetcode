@@ -1,0 +1,10 @@
+[package]
+name = "leetcode"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[[bin]]
+name = "p1254"
+path = "src/p1254.rs"
